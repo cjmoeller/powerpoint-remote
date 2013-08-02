@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+    <item android:id="@+id/menu_start"
+          android:icon="@android:drawable/ic_media_play"
+          android:title="@string/start_pres"
+          android:showAsAction="ifRoom|withText"/>
+    <item android:id="@+id/menu_previous"
+          android:icon="@android:drawable/ic_media_previous"
+          android:title="@string/prev_slide"
+          android:showAsAction="ifRoom|withText"/>
+    <item android:id="@+id/menu_next"
+          android:icon="@android:drawable/ic_media_next"
+          android:title="@string/next_slide"
+          android:showAsAction="ifRoom|withText"/>
+    <item android:id="@+id/menu_stop"
+          android:icon="@android:drawable/ic_delete"
+          android:title="@string/next_slide"
+          android:showAsAction="ifRoom|withText"/>
+</menu>

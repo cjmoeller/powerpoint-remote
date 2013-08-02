@@ -1,0 +1,118 @@
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+                xmlns:tools="http://schemas.android.com/tools"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                tools:context=".MainActivity">
+
+    <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/mainLayout"
+            android:layout_alignParentBottom="true"
+            android:layout_alignParentLeft="true"
+            android:layout_alignParentRight="true"
+            android:layout_alignParentTop="true">
+
+        <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_weight="0.5"
+                android:orientation="vertical">
+            <ViewSwitcher
+                    android:id="@+id/imageSwitcher"
+                    android:layout_width="match_parent"
+                    android:animateLayoutChanges="true"
+                    android:layout_height="0dp"
+                    android:layout_weight="0.98">
+            <ImageView
+                    android:id="@+id/imageView1"
+                    android:layout_width="match_parent"
+                    android:animateLayoutChanges="true"
+                    android:layout_height="fill_parent"
+                    android:src="@drawable/ic_launcher"/>
+            </ViewSwitcher>
+            <View android:layout_width="fill_parent"
+                  android:layout_height="2dip"
+                  android:background="#3699be"/>
+            <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="0.02">
+
+                <Chronometer
+                        android:id="@+id/chronometer1"
+                        android:layout_width="wrap_content"
+                        android:layout_height="match_parent"
+                        android:layout_weight="0.5"
+                        android:text="Chronometer"
+                        android:gravity="center"
+                        android:textSize="100sp"/>
+
+                <LinearLayout
+                        android:layout_width="wrap_content"
+                        android:layout_height="match_parent"
+                        android:animateLayoutChanges="true"
+                        android:layout_weight="0.5"
+                        android:gravity="right"
+                        android:orientation="vertical" android:layout_marginRight="5dp" android:layout_marginTop="20dp">
+
+                    <TextView
+                            android:id="@+id/textView1"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:textSize="20sp"
+                            android:text="Current Slide:"/>
+
+                    <Chronometer
+                            android:id="@+id/chronometer2"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:textSize="20sp"
+                            android:text="Chronometer"/>
+
+                    <TextView
+                            android:id="@+id/textView2"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:textSize="20sp"
+                            android:text="Time:"/>
+
+                    <TextClock
+                            android:id="@+id/textClock1"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:textSize="20sp"
+                            android:text="TextClock"/>
+
+                </LinearLayout>
+
+            </LinearLayout>
+
+        </LinearLayout>
+        <View android:layout_width="2dp"
+              android:layout_height="fill_parent"
+              android:background="#3699be"/>
+        <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:animateLayoutChanges="true"
+                android:layout_weight="0.5"
+                android:orientation="vertical">
+    <ViewSwitcher
+            android:id="@+id/notesSwitcher"
+            android:layout_width="fill_parent"
+            android:layout_height="fill_parent">
+            <TextView
+                    android:id="@+id/textView3"
+                    android:animateLayoutChanges="true"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Notes:"
+                    android:textAppearance="?android:attr/textAppearanceMedium" android:layout_marginTop="10dp"
+                    android:layout_marginLeft="10dp" android:layout_marginRight="10dp"/>
+    </ViewSwitcher>
+        </LinearLayout>
+
+    </LinearLayout>
+
+</RelativeLayout>
