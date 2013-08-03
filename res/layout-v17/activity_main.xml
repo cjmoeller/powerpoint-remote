@@ -77,6 +77,20 @@
                         android:layout_height="wrap_content"
                         android:text="@string/label_chronometer"
                         android:textSize="20sp" />
+
+                    <TextView
+                        android:id="@+id/textView2"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="@string/label_time"
+                        android:textSize="20sp" />
+
+                    <TextClock
+                        android:id="@+id/textClock1"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="@string/label_clock"
+                        android:textSize="20sp" />
                 </LinearLayout>
             </LinearLayout>
         </LinearLayout>

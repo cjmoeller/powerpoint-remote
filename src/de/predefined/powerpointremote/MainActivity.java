@@ -4,6 +4,7 @@ import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.DialogInterface;
+import android.content.pm.ActivityInfo;
 import android.os.Bundle;
 import android.os.SystemClock;
 import android.view.Menu;
@@ -27,6 +28,7 @@ public class MainActivity extends Activity implements View.OnClickListener {
 	private LinearLayout mMainLayout;
 	private boolean mIsPresentationRunning = false;
 	private ConnectionManager mConnection;
+	private Menu mMenu;
 
 	/**
 	 * The onCreate-method, something like a constructor in android Activities
@@ -39,6 +41,7 @@ public class MainActivity extends Activity implements View.OnClickListener {
 		super.onCreate(savedInstanceState);
 		this.setTheme(android.R.style.Theme_Holo);
 		setContentView(R.layout.activity_main);
+		this.setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);
 
 		// UI initialisation
 		mMainLayout = (LinearLayout) findViewById(R.id.mainLayout);
@@ -47,6 +50,7 @@ public class MainActivity extends Activity implements View.OnClickListener {
 		mWholePresChr = (Chronometer) findViewById(R.id.chronometer1);
 		mCurrSlideChr = (Chronometer) findViewById(R.id.chronometer2);
 		mNotes = (TextView) findViewById(R.id.textView3);
+		mCurrentSlide.setVisibility(View.INVISIBLE);
 		// setting the Swipe Listener to our mainLayout
 		mMainLayout.setOnTouchListener(new OnSwipeTouchListener() {
 
@@ -74,6 +78,11 @@ public class MainActivity extends Activity implements View.OnClickListener {
 	public boolean onCreateOptionsMenu(Menu menu) {
 		MenuInflater inflater = getMenuInflater();
 		inflater.inflate(R.menu.main, menu);
+		this.mMenu = menu;
+		mMenu.findItem(R.id.menu_start).setEnabled(false);
+		mMenu.findItem(R.id.menu_next).setEnabled(false);
+		mMenu.findItem(R.id.menu_previous).setEnabled(false);
+		mMenu.findItem(R.id.menu_stop).setEnabled(false);
 		return true;
 	}
 
@@ -141,12 +150,12 @@ public class MainActivity extends Activity implements View.OnClickListener {
 		AlertDialog.Builder alert = new AlertDialog.Builder(this);
 		if (!retry) {
 			alert.setTitle("Connection request");
-			alert.setMessage("If you want to remote control " + this.mServerName
-					+ ", please enter the pairing code.");
+			alert.setMessage("If you want to remote control "
+					+ this.mServerName + ", please enter the pairing code.");
 		} else {
 			alert.setTitle("Wrong Pairing Code.");
-			alert.setMessage("If you want to remote control " + this.mServerName
-					+ ", please try again:");
+			alert.setMessage("If you want to remote control "
+					+ this.mServerName + ", please try again:");
 		}
 		final EditText input = new EditText(this);
 		alert.setView(input);
@@ -209,5 +218,27 @@ public class MainActivity extends Activity implements View.OnClickListener {
 		this.mNotes.setText("Presentation ended.");
 		this.mCurrentSlide.setImageBitmap(null);
 		mIsPresentationRunning = false;
+	}
+
+	/**
+	 * Called, when the Connection was successful.
+	 */
+	public void onConnectSuccess() {
+		Toast.makeText(this, "Connection was successful.", Toast.LENGTH_LONG).show();
+		mMenu.findItem(R.id.menu_start).setEnabled(true);
+		mMenu.findItem(R.id.menu_next).setEnabled(true);
+		mMenu.findItem(R.id.menu_previous).setEnabled(true);
+		mMenu.findItem(R.id.menu_stop).setEnabled(true);
+	}
+
+	/**
+	 * Called, when the connection is lost.
+	 */
+	public void onConnectionLost() {
+		Toast.makeText(this, "Connection Lost.", Toast.LENGTH_LONG).show();
+		mMenu.findItem(R.id.menu_start).setEnabled(false);
+		mMenu.findItem(R.id.menu_next).setEnabled(false);
+		mMenu.findItem(R.id.menu_previous).setEnabled(false);
+		mMenu.findItem(R.id.menu_stop).setEnabled(false);
 	}
 }

@@ -7,7 +7,6 @@ import android.util.Log;
 import java.io.*;
 import java.net.Socket;
 
-
 /**
  * Created by Julius on 18.05.13.
  */
@@ -58,6 +57,15 @@ public class ConnectionManager extends Thread {
 			connection = new Socket(hostName, port);
 			out = new DataOutputStream(connection.getOutputStream());
 			in = new DataInputStream(connection.getInputStream());
+			runningOn.runOnUiThread(new Runnable() {
+
+				@Override
+				public void run() {
+					runningOn.onConnectSuccess();
+				}
+
+			});
+
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
@@ -71,6 +79,7 @@ public class ConnectionManager extends Thread {
 						// Ping
 						System.out.print("PING received");
 					else if (read == 0) {
+						Log.i("PPTREMOTE", "Received authentication ident.");
 						// answer to authentication-request
 						boolean answer = in.readBoolean();
 						if (!answer) {
@@ -78,6 +87,7 @@ public class ConnectionManager extends Thread {
 						}
 						Log.i("PPTREMOTE", "Successfully connected.");
 					} else if (read == 5) {
+						Log.i("PPTREMOTE", "Received notes.");
 						int length = this.receiveInt();
 						byte[] notesArr = new byte[length];
 						in.read(notesArr);
@@ -90,6 +100,7 @@ public class ConnectionManager extends Thread {
 							}
 						});
 					} else if (read == 6) {
+						Log.i("PPTREMOTE", "Received image.");
 						// new image
 						int length = this.receiveInt();
 						byte[] temp = new byte[length];
@@ -105,6 +116,7 @@ public class ConnectionManager extends Thread {
 						});
 
 					} else if (read == 2) {
+						Log.i("PPTREMOTE", "The presentation ended.");
 						runningOn.runOnUiThread(new Runnable() {
 							@Override
 							public void run() {
@@ -116,14 +128,22 @@ public class ConnectionManager extends Thread {
 					try {
 						Thread.sleep(50);
 					} catch (InterruptedException e) {
-						Log.i("PPTREMOTE", e.getMessage());
+						Log.e("PPTREMOTE", e.getMessage());
 					}
 				}
 			} catch (IOException e) {
-				Log.i("PPTREMOTE", e.getMessage());
+				Log.e("PPTREMOTE", e.getMessage());
 			}
 		}
 
+		runningOn.runOnUiThread(new Runnable() {
+
+			@Override
+			public void run() {
+				runningOn.onConnectionLost();
+			}
+
+		});
 	}
 
 	/**
@@ -217,12 +237,13 @@ public class ConnectionManager extends Thread {
 
 		}
 	}
+
 	/**
 	 * Gets an Integer from a byte array.
+	 * 
 	 * @param arr
-	 * 		The byte Array.
-	 * @return
-	 * 		The integer.
+	 *            The byte Array.
+	 * @return The integer.
 	 */
 	private int getIntFromBytes(byte[] arr) {
 		int result = 0;
@@ -233,12 +254,13 @@ public class ConnectionManager extends Thread {
 		Log.i("PPTREMOTE", "Received int: " + result);
 		return result;
 	}
+
 	/**
 	 * Encodes an integer value to a byte array.
+	 * 
 	 * @param value
-	 * 		The integer value.
-	 * @return
-	 * 		The byte array.
+	 *            The integer value.
+	 * @return The byte array.
 	 */
 	private byte[] encodeInt(int value) {
 		byte[] intBuffer = new byte[32];
@@ -251,12 +273,13 @@ public class ConnectionManager extends Thread {
 
 		return intBuffer;
 	}
+
 	/**
 	 * Receives an integer from the server.
-	 * @return 
-	 * 		the integer received from the server.
+	 * 
+	 * @return the integer received from the server.
 	 * @throws IOException
-	 * 		from DataInputStram.readbyte()
+	 *             from DataInputStram.readbyte()
 	 */
 	private int receiveInt() throws IOException {
 		byte[] intBuffer = new byte[32];
@@ -266,7 +289,7 @@ public class ConnectionManager extends Thread {
 		}
 
 		int i = this.getIntFromBytes(intBuffer);
-		System.out.println("INT: " + i);
+		System.out.println("INT: " + i + "Byte array:" + intBuffer.toString());
 
 		return i;
 	}
