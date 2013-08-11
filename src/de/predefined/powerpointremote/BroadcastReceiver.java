@@ -11,7 +11,7 @@ import java.net.DatagramSocket;
  */
 public class BroadcastReceiver extends Thread {
 	/**
-	 * Our port is 4242, this can later be changed in the Settings
+	 * Our port is 34012, this can later be changed in the Settings
 	 */
 	private final int PORT = 34012;
 	private MainActivity current;
@@ -34,11 +34,12 @@ public class BroadcastReceiver extends Thread {
 
 			// Create a packet to receive data into the buffer
 			packet = new DatagramPacket(buffer, buffer.length);
-
+			dsocket.setBroadcast(true);
 			// Now loop forever, waiting to receive packets and printing them.
 			while (true) {
-
+				Log.i("BroadcastReceiver", "Starting BroadcastReceiving.");
 				dsocket.receive(packet);
+				Log.i("BroadcastReceiver", "Ended receving packets");
 				msg = new String(buffer, 0, packet.getLength());
 				System.out.println(packet.getAddress().getHostName() + ": "
 						+ msg);

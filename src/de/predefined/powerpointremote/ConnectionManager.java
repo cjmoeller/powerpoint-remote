@@ -2,6 +2,7 @@ package de.predefined.powerpointremote;
 
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.os.Environment;
 import android.util.Log;
 
 import java.io.*;
@@ -99,14 +100,15 @@ public class ConnectionManager extends Thread {
 								runningOn.onNewSlideReceived(mSlide);
 							}
 						});
-					} else if (read == 6) {
-						Log.i("PPTREMOTE", "Received image.");
+					} else if (read == 6) {						
 						// new image
 						int length = this.receiveInt();
 						byte[] temp = new byte[length];
-						in.read(temp);
+						in.read(temp, 0, length);
+						Log.i("PPTREMOTE", "Received image.");
 						final Bitmap slide = BitmapFactory.decodeByteArray(
 								temp, 0, temp.length);
+						//this.saveTestImage(slide);
 						this.mSlide.setCurrentView(slide);
 						runningOn.runOnUiThread(new Runnable() {
 							@Override
@@ -256,7 +258,7 @@ public class ConnectionManager extends Thread {
 	}
 
 	/**
-	 * Encodes an integer value to a byte array.
+	 * Decodes an integer value to a byte array.
 	 * 
 	 * @param value
 	 *            The integer value.
@@ -293,5 +295,40 @@ public class ConnectionManager extends Thread {
 
 		return i;
 	}
+	private void saveTestImage(Bitmap b){
+		ByteArrayOutputStream bytes = new ByteArrayOutputStream();
+		b.compress(Bitmap.CompressFormat.JPEG, 40, bytes);
 
+		//you can create a new file name "test.jpg" in sdcard folder.
+		File f = new File(Environment.getExternalStorageDirectory()
+		                        + File.separator + "test.jpg");
+		try {
+			f.createNewFile();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		//write the bytes in file
+		FileOutputStream fo = null;
+		try {
+			fo = new FileOutputStream(f);
+		} catch (FileNotFoundException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		try {
+			fo.write(bytes.toByteArray());
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+
+		// remember close de FileOutput
+		try {
+			fo.close();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+	}
 }
