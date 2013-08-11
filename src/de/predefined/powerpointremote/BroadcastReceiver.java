@@ -10,12 +10,19 @@ import java.net.DatagramSocket;
  * Created by Julius on 18.05.13.
  */
 public class BroadcastReceiver extends Thread {
-	/**
-	 * Our port is 34012, this can later be changed in the Settings
-	 */
+	/** Our port is 34012, this can later be changed in the Settings */
 	private final int PORT = 34012;
+	/**
+	 * Reference to MainActivity to avoid unnecessary Listener interfaces (for
+	 * this small project).
+	 */
 	private MainActivity current;
-
+	
+	/**
+	 * The Constructor
+	 * @param c
+	 * 		Reference to the MainActivity.
+	 */
 	public BroadcastReceiver(MainActivity c) {
 		this.current = c;
 	}

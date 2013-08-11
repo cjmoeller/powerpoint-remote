@@ -2,7 +2,6 @@ package de.predefined.powerpointremote;
 
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
-import android.os.Environment;
 import android.util.Log;
 
 import java.io.*;
@@ -12,13 +11,24 @@ import java.net.Socket;
  * Created by Julius on 18.05.13.
  */
 public class ConnectionManager extends Thread {
+	/** The socket. */
 	private Socket connection;
+	/** The data output stream.. */
 	private DataOutputStream out;
+	/** The data input stream. */
 	private DataInputStream in;
+	/** The host name. */
 	private String hostName;
+	/** The pairing code */
 	private String key;
+	/** The port of the server. */
 	private int port;
+	/**
+	 * Reference to MainActivity to avoid unnecessary Listener interfaces (for
+	 * this small project).
+	 */
 	private MainActivity runningOn;
+	/** The current slide object. */
 	private Slide mSlide;
 
 	/**
@@ -88,7 +98,7 @@ public class ConnectionManager extends Thread {
 						}
 						Log.i("PPTREMOTE", "Successfully connected.");
 					} else if (read == 5) {
-						Log.i("PPTREMOTE", "Received notes.");
+						Log.i("PPTREMOTE", "Receive notes.");
 						int length = this.receiveInt();
 						byte[] notesArr = new byte[length];
 						in.read(notesArr);
@@ -100,15 +110,16 @@ public class ConnectionManager extends Thread {
 								runningOn.onNewSlideReceived(mSlide);
 							}
 						});
-					} else if (read == 6) {						
+					} else if (read == 6) {
 						// new image
 						int length = this.receiveInt();
 						byte[] temp = new byte[length];
 						in.read(temp, 0, length);
+						temp = this.shiftByteArray(temp);
 						Log.i("PPTREMOTE", "Received image.");
 						final Bitmap slide = BitmapFactory.decodeByteArray(
 								temp, 0, temp.length);
-						//this.saveTestImage(slide);
+						// this.saveTestImage(slide);
 						this.mSlide.setCurrentView(slide);
 						runningOn.runOnUiThread(new Runnable() {
 							@Override
@@ -295,40 +306,33 @@ public class ConnectionManager extends Thread {
 
 		return i;
 	}
-	private void saveTestImage(Bitmap b){
-		ByteArrayOutputStream bytes = new ByteArrayOutputStream();
-		b.compress(Bitmap.CompressFormat.JPEG, 40, bytes);
-
-		//you can create a new file name "test.jpg" in sdcard folder.
-		File f = new File(Environment.getExternalStorageDirectory()
-		                        + File.separator + "test.jpg");
-		try {
-			f.createNewFile();
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+	/**
+	 * Shifts byte array from C# (0 to 255) to Java (-128 to 127).
+	 * @param b
+	 * 		The 'C# array'.
+	 * @return
+	 * 		The 'Java' Array.
+	 */
+	private byte[] shiftByteArray(byte[] b) {
+		//To revert the overflow we need a bigger type.
+		// C# 137 will be shifted to Java -119
+		// So at first we will reconstruct the C# Array to
+		// convert it correctly to Java bytes.
+		short[] temp = new short[b.length];
+		for (int i = 0; i < b.length; i++) {
+			if (b[i] < 0) {
+				//128 + (128 - 119) = 137 
+				temp[i] = (short) ((short) 128 + (128 + b[i]));
+			} else {
+				// Assuming the C# bytes to 127 are sent correctly
+				// so C# 0 to 127 is the same in Java bytes.
+				temp[i] = b[i];
+			}
+			//Now we have the 'C# array' and shift 0 to 255 to -128 to 127 by subtracting 128.
+			b[i] = (byte) ((byte) temp[i] - 128);
 		}
-		//write the bytes in file
-		FileOutputStream fo = null;
-		try {
-			fo = new FileOutputStream(f);
-		} catch (FileNotFoundException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-		try {
-			fo.write(bytes.toByteArray());
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-
-		// remember close de FileOutput
-		try {
-			fo.close();
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
+		//Finally return the result.
+		return b;
 	}
+	
 }

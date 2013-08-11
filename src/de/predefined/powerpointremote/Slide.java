@@ -3,44 +3,50 @@ package de.predefined.powerpointremote;
 import android.graphics.Bitmap;
 
 /**
- * Created by Julius on 18.05.13.
- * The current slide data is stored in this class
+ * Created by Julius on 18.05.13. The current slide data is stored in this class
  */
 public class Slide {
-    private Bitmap currentView;
-    private String notes;
+	/** The current view. */
+	private Bitmap currentView;
+	/** The notes. */
+	private String notes;
 
-    /**
-     *
-     * @return returns the notes of a slide
-     */
-    public String getNotes() {
-        return notes;
-    }
+	/**
+	 * Gets the notes.
+	 * 
+	 * @return The notes of a slide
+	 */
+	public String getNotes() {
+		return notes;
+	}
 
-    /**
-     *
-     * @param notes the new notes for the slide
-     */
-    public void setNotes(String notes) {
-        this.notes = notes;
-    }
+	/**
+	 * Sets the notes.
+	 * 
+	 * @param notes
+	 *            The new notes for the slide
+	 */
+	public void setNotes(String notes) {
+		this.notes = notes;
+	}
 
-    /**
-     *
-     * @return returns the image of a slide
-     */
-    public Bitmap getCurrentView() {
-        return currentView;
-    }
+	/**
+	 * Gets the current view.
+	 * 
+	 * @return The image of a slide
+	 */
+	public Bitmap getCurrentView() {
+		return currentView;
+	}
 
-    /**
-     *
-     * @param currentView the new image for the slide
-     */
-    public void setCurrentView(Bitmap currentView) {
-        this.currentView = currentView;
-    }
-
+	/**
+	 * Sets the current view.
+	 * 
+	 * @param currentView
+	 *            The new image for the slide
+	 */
+	public void setCurrentView(Bitmap currentView) {
+		this.currentView = currentView;
+	}
 
 }
