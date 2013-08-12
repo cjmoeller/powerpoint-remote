@@ -2,10 +2,14 @@ package de.predefined.powerpointremote;
 
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.os.Environment;
+import android.provider.MediaStore;
 import android.util.Log;
 
 import java.io.*;
 import java.net.Socket;
+import java.nio.ByteBuffer;
+import java.nio.ByteOrder;
 
 /**
  * Created by Julius on 18.05.13.
@@ -114,13 +118,17 @@ public class ConnectionManager extends Thread {
 						// new image
 						int length = this.receiveInt();
 						byte[] temp = new byte[length];
-						in.read(temp, 0, length);
-						temp = this.shiftByteArray(temp);
+						in.readFully(temp, 0, length);
+						ByteArrayInputStream imageStream = new ByteArrayInputStream(
+								temp);
+						Bitmap image = BitmapFactory.decodeStream(imageStream);
+						if (image == null)
+							Log.w("PPTREMOTE", "Warning, image is null. ");
+						// temp = this.shiftByteArray(temp);
 						Log.i("PPTREMOTE", "Received image.");
-						final Bitmap slide = BitmapFactory.decodeByteArray(
-								temp, 0, temp.length);
-						// this.saveTestImage(slide);
-						this.mSlide.setCurrentView(slide);
+						// final Bitmap slide = BitmapFactory.decodeByteArray(
+						// temp, 0, temp.length);						
+						this.mSlide.setCurrentView(image);
 						runningOn.runOnUiThread(new Runnable() {
 							@Override
 							public void run() {
@@ -306,32 +314,34 @@ public class ConnectionManager extends Thread {
 
 		return i;
 	}
+
 	/**
 	 * Shifts byte array from C# (0 to 255) to Java (-128 to 127).
+	 * 
 	 * @param b
-	 * 		The 'C# array'.
-	 * @return
-	 * 		The 'Java' Array.
+	 *            The 'C# array'.
+	 * @return The 'Java' Array.
 	 */
 	private byte[] shiftByteArray(byte[] b) {
-		//To revert the overflow we need a bigger type.
+		// To revert the overflow we need a bigger type.
 		// C# 137 will be shifted to Java -119
 		// So at first we will reconstruct the C# Array to
 		// convert it correctly to Java bytes.
 		short[] temp = new short[b.length];
 		for (int i = 0; i < b.length; i++) {
 			if (b[i] < 0) {
-				//128 + (128 - 119) = 137 
+				// 128 + (128 - 119) = 137
 				temp[i] = (short) ((short) 128 + (128 + b[i]));
 			} else {
 				// Assuming the C# bytes to 127 are sent correctly
 				// so C# 0 to 127 is the same in Java bytes.
 				temp[i] = b[i];
 			}
-			//Now we have the 'C# array' and shift 0 to 255 to -128 to 127 by subtracting 128.
+			// Now we have the 'C# array' and shift 0 to 255 to -128 to 127 by
+			// subtracting 128.
 			b[i] = (byte) ((byte) temp[i] - 128);
 		}
-		//Finally return the result.
+		// Finally return the result.
 		return b;
 	}
 	

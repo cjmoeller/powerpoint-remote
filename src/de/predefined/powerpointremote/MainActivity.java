@@ -188,6 +188,7 @@ public class MainActivity extends Activity implements View.OnClickListener {
 	 *            the new Image
 	 */
 	public void onImageChanged(Slide newSlide) {
+		mCurrentSlide.setVisibility(View.VISIBLE);
 		mCurrentSlide.setImageBitmap(newSlide.getCurrentView());
 	}
 
