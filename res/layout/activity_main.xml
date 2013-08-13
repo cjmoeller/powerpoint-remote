@@ -19,21 +19,14 @@
             android:layout_weight="0.5"
             android:orientation="vertical" >
 
-            <ViewSwitcher
-                android:id="@+id/imageSwitcher"
+            <ImageView
+                android:id="@+id/imageView1"
                 android:layout_width="fill_parent"
                 android:layout_height="0dp"
                 android:layout_weight="0.8"
-                android:animateLayoutChanges="true" >
-
-                <ImageView
-                    android:id="@+id/imageView1"
-                    android:layout_width="fill_parent"
-                    android:layout_height="fill_parent"
-                    android:animateLayoutChanges="true"
-                    android:contentDescription="@string/content_slide_view"
-                    android:src="@drawable/ic_launcher" />
-            </ViewSwitcher>
+                android:animateLayoutChanges="true"
+                android:contentDescription="@string/content_slide_view"
+                android:src="@drawable/ic_launcher" />
 
             <View
                 android:layout_width="fill_parent"

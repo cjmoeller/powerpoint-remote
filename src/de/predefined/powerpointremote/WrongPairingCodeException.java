@@ -1,8 +1,8 @@
 package de.predefined.powerpointremote;
 
 /**
- * Created by Julius on 23.05.13.
- * This Exception is thrown, when the user enters a wrong pairing Code
+ * Throw this Exception when the user enters a wrong pairing Code.
+ * @author Julius
  */
 public class WrongPairingCodeException extends Exception {
     /**
@@ -12,6 +12,11 @@ public class WrongPairingCodeException extends Exception {
 	public WrongPairingCodeException() {
 
     }
+	/**
+	 * The constructor
+	 * @param msg
+	 * 		A custom message to display.
+	 */
     public WrongPairingCodeException(String msg) {
         super(msg);
     }

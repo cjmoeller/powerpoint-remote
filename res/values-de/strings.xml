@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <string name="app_name">PowerpointRemote</string>
+    <string name="action_settings">Einstellungen</string>
+    <string name="next_slide">Vor</string>
+    <string name="prev_slide">Zurück</string>
+    <string name="start_pres">Start</string>
+    <string name="stop_pres">Stop</string>
+    <string name="content_slide_view">Die aktuelle Folie</string>
+    <string name="label_chronometer">Chronometer</string>
+    <string name="label_current_slide">Aktuelle Folie:</string>
+    <string name="label_time">Uhrzeit:</string>
+    <string name="label_clock">Uhr</string>
+    <string name="label_notes">Notizen:</string>
+    <string name="msg_current_slide_image">Aktuelle Folie</string>
+    <string name="msg_conncetion_request">Verbindungsanfrage</string>
+    <string name="label_control_question" formatted="false">Wenn Sie %s fernsteuern möchten, geben Sie bitte den Pairing-Code ein:</string>
+    <string name="msg_wrong_pairing_code">Falscher Pairing-Code</string>
+    <string name="label_connect_retry" formatted="false">Wenn Sie %s fernsteuern möchten, versuchen Sie es bitte noch einmal:</string>
+    <string name="label_ok">OK</string>
+    <string name="label_cancel">Abbrechen</string>
+    <string name="label_presentation_ended">Die Präsentation ist zu Ende.</string>
+    <string name="msg_connection_successful">Verbindung erfolgreich.</string>
+    <string name="msg_connection_lost">Die Verbindung wurde unterbrochen.</string>
+
+</resources>

@@ -3,7 +3,8 @@ package de.predefined.powerpointremote;
 import android.graphics.Bitmap;
 
 /**
- * Created by Julius on 18.05.13. The current slide data is stored in this class
+ * This class represents a slide.
+ * @author Julius
  */
 public class Slide {
 	/** The current view. */

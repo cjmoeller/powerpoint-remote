@@ -8,7 +8,7 @@ import android.view.View.OnTouchListener;
 
 /**
  * Our Swipe touch Listener from http://stackoverflow.com/questions/4139288/android-how-to-handle-right-to-left-swipe-gestures, 23.05.2013
- * Does not work on the Nexus 7 (I tested it, may work on other devices)...
+ * Does not work on the Nexus 7 with Android 4.2.2 (I tested it, may work on other devices)...
  */
 public class OnSwipeTouchListener implements OnTouchListener {
 

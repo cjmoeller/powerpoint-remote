@@ -22,20 +22,20 @@ public final class R {
         public static final int ic_launcher=0x7f020000;
     }
     public static final class id {
-        public static final int chronometer1=0x7f080003;
-        public static final int chronometer2=0x7f080005;
-        public static final int imageSwitcher=0x7f080001;
-        public static final int imageView1=0x7f080002;
+        public static final int chronometer1=0x7f080002;
+        public static final int chronometer2=0x7f080004;
+        public static final int imageSwitcher=0x7f080007;
+        public static final int imageView1=0x7f080001;
         public static final int mainLayout=0x7f080000;
         public static final int menu_next=0x7f08000c;
         public static final int menu_previous=0x7f08000b;
         public static final int menu_start=0x7f08000a;
         public static final int menu_stop=0x7f08000d;
-        public static final int notesSwitcher=0x7f080006;
+        public static final int notesSwitcher=0x7f080005;
         public static final int textClock1=0x7f080009;
-        public static final int textView1=0x7f080004;
+        public static final int textView1=0x7f080003;
         public static final int textView2=0x7f080008;
-        public static final int textView3=0x7f080007;
+        public static final int textView3=0x7f080006;
     }
     public static final class layout {
         public static final int activity_main=0x7f030000;
@@ -47,11 +47,21 @@ public final class R {
         public static final int action_settings=0x7f050001;
         public static final int app_name=0x7f050000;
         public static final int content_slide_view=0x7f050006;
+        public static final int label_cancel=0x7f050012;
         public static final int label_chronometer=0x7f050007;
         public static final int label_clock=0x7f05000a;
+        public static final int label_connect_retry=0x7f050010;
+        public static final int label_control_question=0x7f05000e;
         public static final int label_current_slide=0x7f050008;
         public static final int label_notes=0x7f05000b;
+        public static final int label_ok=0x7f050011;
+        public static final int label_presentation_ended=0x7f050013;
         public static final int label_time=0x7f050009;
+        public static final int msg_conncetion_request=0x7f05000d;
+        public static final int msg_connection_lost=0x7f050015;
+        public static final int msg_connection_successful=0x7f050014;
+        public static final int msg_current_slide_image=0x7f05000c;
+        public static final int msg_wrong_pairing_code=0x7f05000f;
         public static final int next_slide=0x7f050002;
         public static final int prev_slide=0x7f050003;
         public static final int start_pres=0x7f050004;

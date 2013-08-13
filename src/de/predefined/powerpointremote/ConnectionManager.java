@@ -2,17 +2,14 @@ package de.predefined.powerpointremote;
 
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
-import android.os.Environment;
-import android.provider.MediaStore;
 import android.util.Log;
 
 import java.io.*;
 import java.net.Socket;
-import java.nio.ByteBuffer;
-import java.nio.ByteOrder;
 
 /**
- * Created by Julius on 18.05.13.
+ * This class manages the connection to the server.
+ * @author Julius
  */
 public class ConnectionManager extends Thread {
 	/** The socket. */
@@ -39,13 +36,13 @@ public class ConnectionManager extends Thread {
 	 * Create a new ConnectionManager.
 	 * 
 	 * @param host
-	 *            The servers hostname
+	 *            The servers hostname.
 	 * @param port
-	 *            The servers port
+	 *            The servers port.
 	 * @param key
-	 *            The pairing key, entered by the user
+	 *            The pairing key, entered by the user.
 	 * @param runningOn
-	 *            the instance of our MainActivity that created this Thread
+	 *            the instance of our MainActivity that created this Thread.
 	 */
 	public ConnectionManager(String host, int port, String key,
 			MainActivity runningOn) {
@@ -57,7 +54,7 @@ public class ConnectionManager extends Thread {
 	}
 
 	/**
-	 * Tries to open a connection for our PPTREMOTE-Protocol
+	 * Tries to open a connection for our PPTREMOTE-Protocol.
 	 * 
 	 * @param hostName
 	 *            The servers hostname
@@ -84,87 +81,11 @@ public class ConnectionManager extends Thread {
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
+
 		// main loop
 		authenticate(key);
-		while (!connection.isClosed()) {
-			try {
-				if (in.available() > 0) {
-					byte read = in.readByte();
-					if (read == 100)
-						// Ping
-						System.out.print("PING received");
-					else if (read == 0) {
-						Log.i("PPTREMOTE", "Received authentication ident.");
-						// answer to authentication-request
-						boolean answer = in.readBoolean();
-						if (!answer) {
-							throw new WrongPairingCodeException();
-						}
-						Log.i("PPTREMOTE", "Successfully connected.");
-					} else if (read == 5) {
-						Log.i("PPTREMOTE", "Receive notes.");
-						int length = this.receiveInt();
-						byte[] notesArr = new byte[length];
-						in.read(notesArr);
-						final String notes = new String(notesArr, "UTF-8");
-						this.mSlide.setNotes(notes);
-						runningOn.runOnUiThread(new Runnable() {
-							@Override
-							public void run() {
-								runningOn.onNewSlideReceived(mSlide);
-							}
-						});
-					} else if (read == 6) {
-						// new image
-						int length = this.receiveInt();
-						byte[] temp = new byte[length];
-						in.readFully(temp, 0, length);
-						ByteArrayInputStream imageStream = new ByteArrayInputStream(
-								temp);
-						Bitmap image = BitmapFactory.decodeStream(imageStream);
-						if (image == null)
-							Log.w("PPTREMOTE", "Warning, image is null. ");
-						// temp = this.shiftByteArray(temp);
-						Log.i("PPTREMOTE", "Received image.");
-						// final Bitmap slide = BitmapFactory.decodeByteArray(
-						// temp, 0, temp.length);						
-						this.mSlide.setCurrentView(image);
-						runningOn.runOnUiThread(new Runnable() {
-							@Override
-							public void run() {
-								runningOn.onImageChanged(mSlide);
-							}
-						});
+		processRequests();
 
-					} else if (read == 2) {
-						Log.i("PPTREMOTE", "The presentation ended.");
-						runningOn.runOnUiThread(new Runnable() {
-							@Override
-							public void run() {
-								runningOn.onPresentationEnded();
-							}
-						});
-					}
-				} else {
-					try {
-						Thread.sleep(50);
-					} catch (InterruptedException e) {
-						Log.e("PPTREMOTE", e.getMessage());
-					}
-				}
-			} catch (IOException e) {
-				Log.e("PPTREMOTE", e.getMessage());
-			}
-		}
-
-		runningOn.runOnUiThread(new Runnable() {
-
-			@Override
-			public void run() {
-				runningOn.onConnectionLost();
-			}
-
-		});
 	}
 
 	/**
@@ -200,7 +121,7 @@ public class ConnectionManager extends Thread {
 	 */
 	public void nextSlide() {
 		try {
-			out.writeByte(3);
+			out.writeByte(MessageID.NEXT_SLIDE);
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
@@ -211,7 +132,7 @@ public class ConnectionManager extends Thread {
 	 */
 	public void previousSlide() {
 		try {
-			out.writeByte(4);
+			out.writeByte(MessageID.PREVIOUS_SLIDE);
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
@@ -222,19 +143,18 @@ public class ConnectionManager extends Thread {
 	 */
 	public void startPresentation() {
 		try {
-			out.writeByte(1);
+			out.writeByte(MessageID.START_PRESENTATION);
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
 	}
 
 	/**
-	 * Send a request to stop the presentation NOT IMPLEMENTED YET ON SERVER
-	 * SIDE
+	 * Send a request to stop the presentation.
 	 */
 	public void stopPresentation() {
 		try {
-			out.writeByte(2);
+			out.writeByte(MessageID.STOP_PRESENTATION);
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
@@ -316,33 +236,90 @@ public class ConnectionManager extends Thread {
 	}
 
 	/**
-	 * Shifts byte array from C# (0 to 255) to Java (-128 to 127).
+	 * Main communication with the server.
 	 * 
-	 * @param b
-	 *            The 'C# array'.
-	 * @return The 'Java' Array.
+	 * @throws WrongPairingCodeException
+	 *             is thrown if the user entered a wrong pairing code.
 	 */
-	private byte[] shiftByteArray(byte[] b) {
-		// To revert the overflow we need a bigger type.
-		// C# 137 will be shifted to Java -119
-		// So at first we will reconstruct the C# Array to
-		// convert it correctly to Java bytes.
-		short[] temp = new short[b.length];
-		for (int i = 0; i < b.length; i++) {
-			if (b[i] < 0) {
-				// 128 + (128 - 119) = 137
-				temp[i] = (short) ((short) 128 + (128 + b[i]));
-			} else {
-				// Assuming the C# bytes to 127 are sent correctly
-				// so C# 0 to 127 is the same in Java bytes.
-				temp[i] = b[i];
+	private void processRequests() throws WrongPairingCodeException {
+		while (!connection.isClosed()) {
+			try {
+				if (in.available() > 0) {
+					byte read = in.readByte();
+					switch (read) {
+					case MessageID.PING:
+						System.out.print("PING received. ");
+						break;
+					case MessageID.AUTHENTICATE:
+						boolean answer = in.readBoolean();
+						Log.i("PPTREMOTE", "Received auth answer.");
+						if (!answer) {
+							throw new WrongPairingCodeException();
+						}
+						break;
+					case MessageID.NOTES_DATA:
+						int notesLength = this.receiveInt();
+						byte[] notesArr = new byte[notesLength];
+						in.readFully(notesArr);
+						final String notes = new String(notesArr, "UTF-8");
+						Log.i("PPTREMOTE", "Received notes data.");
+						this.mSlide.setNotes(notes);
+						runningOn.runOnUiThread(new Runnable() {
+							@Override
+							public void run() {
+								runningOn.onNewSlideReceived(mSlide);
+							}
+						});
+						break;
+					case MessageID.IMAGE_DATA:
+						// new image
+						int imageLength = this.receiveInt();
+						byte[] temp = new byte[imageLength];
+						in.readFully(temp, 0, imageLength);
+						ByteArrayInputStream imageStream = new ByteArrayInputStream(
+								temp);
+						Bitmap image = BitmapFactory.decodeStream(imageStream);
+						Log.i("PPTREMOTE", "Received image.");
+						this.mSlide.setCurrentView(image);
+						runningOn.runOnUiThread(new Runnable() {
+							@Override
+							public void run() {
+								runningOn.onImageChanged(mSlide);
+							}
+						});
+						break;
+					case MessageID.STOP_PRESENTATION:
+						Log.i("PPTREMOTE", "The presentation ended.");
+						runningOn.runOnUiThread(new Runnable() {
+							@Override
+							public void run() {
+								runningOn.onPresentationEnded();
+							}
+						});
+						break;
+					}
+				} else {
+					try {
+						Thread.sleep(50);
+					} catch (InterruptedException e) {
+						Log.e("PPTREMOTE", e.getMessage());
+					}
+				}
+			} catch (IOException e) {
+				Log.e("PPTREMOTE", e.getMessage());
 			}
-			// Now we have the 'C# array' and shift 0 to 255 to -128 to 127 by
-			// subtracting 128.
-			b[i] = (byte) ((byte) temp[i] - 128);
 		}
-		// Finally return the result.
-		return b;
+
+		runningOn.runOnUiThread(new Runnable() {
+
+			@Override
+			public void run() {
+				runningOn.onConnectionLost();
+			}
+
+		});
+		this.disconnect();
+
 	}
-	
+
 }

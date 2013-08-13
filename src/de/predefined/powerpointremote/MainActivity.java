@@ -5,35 +5,56 @@ import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.content.pm.ActivityInfo;
+import android.graphics.drawable.BitmapDrawable;
 import android.os.Bundle;
 import android.os.SystemClock;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.animation.AlphaAnimation;
+import android.view.animation.Animation;
 import android.widget.Chronometer;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
-
+/**
+ * The main activity that handles the users interactions with the ui.
+ * @author Julius
+ *
+ */
 public class MainActivity extends Activity implements View.OnClickListener {
+	/** ImageView for the current slide */
 	private ImageView mCurrentSlide;
+	/** The server name. */
 	private String mServerName = "";
+	/** The host address of the server. */
 	private String mHostAdress = "";
+	/**
+	 * The chronometer that displays the whole time since the presentation
+	 * started .
+	 */
 	private Chronometer mWholePresChr;
+	/**
+	 * The chronometer that displays the time since the current slide was
+	 * opened.
+	 */
 	private Chronometer mCurrSlideChr;
+	/** The TextView to display notes. */
 	private TextView mNotes;
+	/** The main layout to add the OnSwipeTouchListener to it. */
 	private LinearLayout mMainLayout;
+	/** true if the presentation is running. */
 	private boolean mIsPresentationRunning = false;
+	/** The connection manager. */
 	private ConnectionManager mConnection;
+	/** The Menu/ Actionbar. */
 	private Menu mMenu;
 
-	/**
+	/*
 	 * The onCreate-method, something like a constructor in android Activities
-	 * 
-	 * @param savedInstanceState
 	 */
 	@SuppressLint("InlinedApi")
 	@Override
@@ -43,7 +64,7 @@ public class MainActivity extends Activity implements View.OnClickListener {
 		setContentView(R.layout.activity_main);
 		this.setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);
 
-		// UI initialisation
+		// UI initialization
 		mMainLayout = (LinearLayout) findViewById(R.id.mainLayout);
 		mCurrentSlide = (ImageView) findViewById(R.id.imageView1);
 		mCurrentSlide.setOnClickListener(this);
@@ -62,18 +83,12 @@ public class MainActivity extends Activity implements View.OnClickListener {
 				MainActivity.this.mConnection.previousSlide();
 			}
 		});
-		// start a new Broadcastreceiver Thread
+		// Start a new Broadcastreceiver Thread:
 		BroadcastReceiver bcr = new BroadcastReceiver(this);
 		bcr.start();
 
 	}
 
-	/**
-	 * "Constructor" of the options menue
-	 * 
-	 * @param menu
-	 * @return
-	 */
 	@Override
 	public boolean onCreateOptionsMenu(Menu menu) {
 		MenuInflater inflater = getMenuInflater();
@@ -86,12 +101,6 @@ public class MainActivity extends Activity implements View.OnClickListener {
 		return true;
 	}
 
-	/**
-	 * This method is called, when an Options Menu Item is selected
-	 * 
-	 * @param item
-	 * @return
-	 */
 	@Override
 	public boolean onOptionsItemSelected(MenuItem item) {
 		switch (item.getItemId()) {
@@ -112,16 +121,18 @@ public class MainActivity extends Activity implements View.OnClickListener {
 		}
 	}
 
-	/**
-	 * Debug things
-	 * 
-	 * @param view
-	 */
 	@Override
 	public void onClick(View view) {
-		if (view.equals(mCurrentSlide))
-			Toast.makeText(this.getApplicationContext(), "Touched ImageView1",
-					Toast.LENGTH_LONG).show();
+		if (view.equals(mCurrentSlide)) {
+			AlertDialog.Builder alert = new AlertDialog.Builder(this);
+			alert.setTitle(R.string.msg_current_slide_image);
+			ImageView alertView = new ImageView(this);
+			alertView.setImageBitmap(((BitmapDrawable) mCurrentSlide
+					.getDrawable()).getBitmap());
+			alert.setView(alertView);
+			alert.show();
+		}
+
 	}
 
 	/**
@@ -149,29 +160,31 @@ public class MainActivity extends Activity implements View.OnClickListener {
 	public void authenticateProcedure(boolean retry) {
 		AlertDialog.Builder alert = new AlertDialog.Builder(this);
 		if (!retry) {
-			alert.setTitle("Connection request");
-			alert.setMessage("If you want to remote control "
-					+ this.mServerName + ", please enter the pairing code.");
+			alert.setTitle(R.string.msg_conncetion_request);
+			alert.setMessage(String.format(
+					getString(R.string.label_control_question),
+					this.mServerName));
 		} else {
-			alert.setTitle("Wrong Pairing Code.");
-			alert.setMessage("If you want to remote control "
-					+ this.mServerName + ", please try again:");
+			alert.setTitle(R.string.msg_wrong_pairing_code);
+			alert.setMessage(R.string.label_connect_retry);
 		}
 		final EditText input = new EditText(this);
 		alert.setView(input);
 
-		alert.setPositiveButton("Ok", new DialogInterface.OnClickListener() {
-			public void onClick(DialogInterface dialog, int whichButton) {
-				if (mConnection != null)
-					mConnection.disconnect();
-				mConnection = new ConnectionManager(
-						MainActivity.this.mHostAdress, 34012, input.getText()
-								.toString(), MainActivity.this);
-				mConnection.start();
-			}
-		});
+		alert.setPositiveButton(R.string.label_ok,
+				new DialogInterface.OnClickListener() {
+					public void onClick(DialogInterface dialog, int whichButton) {
+						if (mConnection != null)
+							mConnection.disconnect();
+						mConnection = new ConnectionManager(
+								MainActivity.this.mHostAdress, 34012, input
+										.getText().toString(),
+								MainActivity.this);
+						mConnection.start();
+					}
+				});
 
-		alert.setNegativeButton("Cancel",
+		alert.setNegativeButton(R.string.label_cancel,
 				new DialogInterface.OnClickListener() {
 					public void onClick(DialogInterface dialog, int whichButton) {
 						// Canceled.
@@ -182,22 +195,29 @@ public class MainActivity extends Activity implements View.OnClickListener {
 	}
 
 	/**
-	 * Changes the current Slide Image
+	 * Changes the current slide image.
 	 * 
 	 * @param b
-	 *            the new Image
+	 *            The new Image.
 	 */
 	public void onImageChanged(Slide newSlide) {
+		Animation fadeOut = new AlphaAnimation(1.0f, 0.0f);
+		Animation fadeIn = new AlphaAnimation(0.0f, 1.0f);	
+		fadeOut.setDuration(500);
+		fadeIn.setDuration(500);
+		mCurrentSlide.startAnimation(fadeOut);
+		mCurrentSlide.setImageBitmap(newSlide.getCurrentView());		
 		mCurrentSlide.setVisibility(View.VISIBLE);
-		mCurrentSlide.setImageBitmap(newSlide.getCurrentView());
+		mCurrentSlide.startAnimation(fadeIn);
+		
 	}
 
 	/**
 	 * The method is called if we receive new notes from the server, i.e. a new
-	 * Slide
+	 * Slide.
 	 * 
 	 * @param notes
-	 *            Slide notes received from the server
+	 *            Slide notes received from the server.
 	 */
 	public void onNewSlideReceived(Slide newSlide) {
 		if (!mIsPresentationRunning) {
@@ -207,16 +227,17 @@ public class MainActivity extends Activity implements View.OnClickListener {
 		}
 		mCurrSlideChr.setBase(SystemClock.elapsedRealtime());
 		mCurrSlideChr.start();
-		this.mNotes.setText(newSlide.getNotes());
+		this.mNotes.setText(getString(R.string.label_notes) + "\n"
+				+ newSlide.getNotes());
 	}
 
 	/**
-	 * When the presentation ends we have to reset some values
+	 * When the presentation ends we have to reset some values.
 	 */
 	public void onPresentationEnded() {
 		mWholePresChr.stop();
 		mCurrSlideChr.stop();
-		this.mNotes.setText("Presentation ended.");
+		this.mNotes.setText(R.string.label_presentation_ended);
 		this.mCurrentSlide.setImageBitmap(null);
 		mIsPresentationRunning = false;
 	}
@@ -225,7 +246,8 @@ public class MainActivity extends Activity implements View.OnClickListener {
 	 * Called, when the Connection was successful.
 	 */
 	public void onConnectSuccess() {
-		Toast.makeText(this, "Connection was successful.", Toast.LENGTH_LONG).show();
+		Toast.makeText(this, getString(R.string.msg_connection_successful),
+				Toast.LENGTH_LONG).show();
 		mMenu.findItem(R.id.menu_start).setEnabled(true);
 		mMenu.findItem(R.id.menu_next).setEnabled(true);
 		mMenu.findItem(R.id.menu_previous).setEnabled(true);
@@ -236,10 +258,15 @@ public class MainActivity extends Activity implements View.OnClickListener {
 	 * Called, when the connection is lost.
 	 */
 	public void onConnectionLost() {
-		Toast.makeText(this, "Connection Lost.", Toast.LENGTH_LONG).show();
+		Toast.makeText(this, getString(R.string.msg_connection_lost),
+				Toast.LENGTH_LONG).show();
 		mMenu.findItem(R.id.menu_start).setEnabled(false);
 		mMenu.findItem(R.id.menu_next).setEnabled(false);
 		mMenu.findItem(R.id.menu_previous).setEnabled(false);
 		mMenu.findItem(R.id.menu_stop).setEnabled(false);
+		this.mNotes.setText(R.string.label_notes);
+		this.mCurrentSlide.setVisibility(View.INVISIBLE);
+		BroadcastReceiver bcr = new BroadcastReceiver(this);
+		bcr.start();
 	}
 }

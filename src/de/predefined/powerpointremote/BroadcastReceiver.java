@@ -7,7 +7,8 @@ import java.net.DatagramPacket;
 import java.net.DatagramSocket;
 
 /**
- * Created by Julius on 18.05.13.
+ * This BroadcastRecevier receives UDP-Broadcastmessages from the server.
+ * @author Julius
  */
 public class BroadcastReceiver extends Thread {
 	/** Our port is 34012, this can later be changed in the Settings */
@@ -35,14 +36,12 @@ public class BroadcastReceiver extends Thread {
 		String msg = null;
 		DatagramPacket packet = null;
 		try {
-			// Create a socket to listen on the port.
+			
 			DatagramSocket dsocket = new DatagramSocket(PORT);
 			byte[] buffer = new byte[2048];
-
-			// Create a packet to receive data into the buffer
+			
 			packet = new DatagramPacket(buffer, buffer.length);
-			dsocket.setBroadcast(true);
-			// Now loop forever, waiting to receive packets and printing them.
+			dsocket.setBroadcast(true);			
 			while (true) {
 				Log.i("BroadcastReceiver", "Starting BroadcastReceiving.");
 				dsocket.receive(packet);

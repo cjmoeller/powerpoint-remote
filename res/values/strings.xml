@@ -13,6 +13,15 @@
     <string name="label_time">Time:</string>
     <string name="label_clock">Clock</string>
     <string name="label_notes">Notes:</string>
-    
+    <string name="msg_current_slide_image">Current Slide</string>
+    <string name="msg_conncetion_request">Connection request</string>
+    <string name="label_control_question" formatted="false">If you want to remote control %s, please enter the pairing code.</string>
+    <string name="msg_wrong_pairing_code">Wrong Pairing Code</string>
+    <string name="label_connect_retry" formatted="false">If you want to remote control %s, please try again:</string>
+    <string name="label_ok">OK</string>
+    <string name="label_cancel">Cancel</string>
+    <string name="label_presentation_ended">Presentation ended.</string>
+    <string name="msg_connection_successful">Connection was successful.</string>
+    <string name="msg_connection_lost">Connection lost.</string>
 
 </resources>
