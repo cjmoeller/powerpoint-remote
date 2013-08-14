@@ -17,7 +17,7 @@ public class BroadcastReceiver extends Thread {
 	 * Reference to MainActivity to avoid unnecessary Listener interfaces (for
 	 * this small project).
 	 */
-	private MainActivity current;
+	private MainActivity runningOn;
 	
 	/**
 	 * The Constructor
@@ -25,7 +25,7 @@ public class BroadcastReceiver extends Thread {
 	 * 		Reference to the MainActivity.
 	 */
 	public BroadcastReceiver(MainActivity c) {
-		this.current = c;
+		this.runningOn = c;
 	}
 
 	/**
@@ -61,10 +61,10 @@ public class BroadcastReceiver extends Thread {
 					+ e.getCause());
 		}
 		final String[] result = { msg, packet.getAddress().getHostName() };
-		current.runOnUiThread(new Runnable() {
+		runningOn.runOnUiThread(new Runnable() {
 			@Override
 			public void run() {
-				current.onServerFound(result);
+				runningOn.onServerFound(result);
 			}
 		});
 
