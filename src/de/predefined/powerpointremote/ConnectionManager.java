@@ -260,7 +260,7 @@ public class ConnectionManager extends Thread {
 					case MessageID.NOTES_DATA:
 						int notesLength = this.receiveInt();
 						byte[] notesArr = new byte[notesLength];
-						in.readFully(notesArr);
+						in.readFully(notesArr, 0, notesLength);
 						final String notes = new String(notesArr, "UTF-8");
 						Log.i("PPTREMOTE", "Received notes data.");
 						this.mSlide.setNotes(notes);
